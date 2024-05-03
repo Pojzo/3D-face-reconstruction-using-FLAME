@@ -1,0 +1,190 @@
+{
+ "cells": [
+  {
+   "cell_type": "code",
+   "execution_count": 2,
+   "id": "1469daca-83db-439f-8ad3-03b0df5d1434",
+   "metadata": {},
+   "outputs": [],
+   "source": [
+    "from tensorflow_graphics.rendering import rasterization_backend"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": 9,
+   "id": "7137bbc9-087b-4dc0-a7e8-d4999f03cb86",
+   "metadata": {},
+   "outputs": [
+    {
+     "name": "stdout",
+     "output_type": "stream",
+     "text": [
+      "C:\\Users\\pojzi\\Programovanie\\bakalarka\\reconstruct_src\\src\n"
+     ]
+    }
+   ],
+   "source": [
+    "import open3d as o3d\n",
+    "import os\n",
+    "import numpy as np\n",
+    "\n",
+    "print(os.getcwd())\n",
+    "\n",
+    "mesh = o3d.io.read_triangle_mesh(\"ply_sample.ply\")"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": 17,
+   "id": "3f6e4042-4173-417f-9722-8c0a1bf83018",
+   "metadata": {},
+   "outputs": [
+    {
+     "name": "stdout",
+     "output_type": "stream",
+     "text": [
+      "(5023, 3) (9976, 3)\n"
+     ]
+    }
+   ],
+   "source": [
+    "vertices = np.asarray(mesh.vertices)\n",
+    "faces = np.asarray(mesh.triangles)\n",
+    "\n",
+    "print(vertices.shape, faces.shape)"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": 42,
+   "id": "d4d942d4-6a8e-4238-9bc8-f6e0890766d3",
+   "metadata": {},
+   "outputs": [],
+   "source": [
+    "import tensorflow as tf\n",
+    "import tensorflow_graphics as tfg\n",
+    "from tensorflow_graphics.geometry.transformation import look_at\n",
+    "from tensorflow_graphics.rendering.camera import perspective\n",
+    "\n",
+    "from tensorflow_graphics.rendering import rasterization_backend\n",
+    "\n",
+    "def rasterize(vertices, faces):\n",
+    "\n",
+    "    vertices_tensor = tf.convert_to_tensor(vertices)\n",
+    "    faces_tensor = tf.convert_to_tensor(faces)\n",
+    "    # Camera setup\n",
+    "    camera_position = tf.constant([[0.0, 0.0, 3.0]], dtype=tf.float32)\n",
+    "    look_at_point = tf.constant([[0.0, 0.0, 0.0]], dtype=tf.float32)\n",
+    "    camera_up = tf.constant([[0.0, 1.0, 0.0]], dtype=tf.float32)\n",
+    "\n",
+    "    # View matrix\n",
+    "    view_matrix = look_at.right_handed(camera_position, look_at_point, camera_up)\n",
+    "\n",
+    "    # Projection matrix\n",
+    "    vertical_field_of_view = tf.constant([[np.pi / 4]], dtype=tf.float32)  # 45 degrees in radians\n",
+    "    aspect_ratio = tf.constant([[1.0]], dtype=tf.float32)\n",
+    "    near_plane = tf.constant([[0.1]], dtype=tf.float32)\n",
+    "    far_plane = tf.constant([[10.0]], dtype=tf.float32)\n",
+    "    projection_matrix = perspective.right_handed(vertical_field_of_view, aspect_ratio, near_plane, far_plane)\n",
+    "\n",
+    "    # Combine view and projection matrices\n",
+    "    view_projection_matrix = tf.linalg.matmul(projection_matrix, view_matrix)\n",
+    "\n",
+    "    # Specify the size of the image\n",
+    "    image_size = (800, 800)  # Output image size in pixels\n",
+    "\n",
+    "    # Use TensorFlow Graphics rasterizer (replace with actual rasterization call if using a different version)\n",
+    "    rasterized_image = rasterization_backend.rasterize(vertices_tensor, faces_tensor, view_projection_matrix, image_size)\n",
+    "\n",
+    "    return rasterized_image"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": 43,
+   "id": "39100766-70a2-486d-b1a1-345ba24105d2",
+   "metadata": {},
+   "outputs": [
+    {
+     "ename": "NotFoundError",
+     "evalue": "C:\\Users\\pojzi\\.conda\\envs\\reconstruct_src\\lib\\site-packages\\tensorflow_graphics\\rendering\\opengl\\rasterizer_op.so not found",
+     "output_type": "error",
+     "traceback": [
+      "\u001b[1;31m---------------------------------------------------------------------------\u001b[0m",
+      "\u001b[1;31mImportError\u001b[0m                               Traceback (most recent call last)",
+      "File \u001b[1;32m~\\.conda\\envs\\reconstruct_src\\lib\\site-packages\\tensorflow_graphics\\rendering\\opengl\\rasterization_backend.py:26\u001b[0m\n\u001b[0;32m     25\u001b[0m \u001b[38;5;28;01mtry\u001b[39;00m:\n\u001b[1;32m---> 26\u001b[0m   \u001b[38;5;28;01mfrom\u001b[39;00m \u001b[38;5;21;01mtensorflow_graphics\u001b[39;00m\u001b[38;5;21;01m.\u001b[39;00m\u001b[38;5;21;01mrendering\u001b[39;00m\u001b[38;5;21;01m.\u001b[39;00m\u001b[38;5;21;01mopengl\u001b[39;00m \u001b[38;5;28;01mimport\u001b[39;00m gen_rasterizer_op \u001b[38;5;28;01mas\u001b[39;00m render_ops\n\u001b[0;32m     27\u001b[0m \u001b[38;5;28;01mexcept\u001b[39;00m \u001b[38;5;167;01mImportError\u001b[39;00m:\n",
+      "\u001b[1;31mImportError\u001b[0m: cannot import name 'gen_rasterizer_op' from 'tensorflow_graphics.rendering.opengl' (C:\\Users\\pojzi\\.conda\\envs\\reconstruct_src\\lib\\site-packages\\tensorflow_graphics\\rendering\\opengl\\__init__.py)",
+      "\nDuring handling of the above exception, another exception occurred:\n",
+      "\u001b[1;31mNotFoundError\u001b[0m                             Traceback (most recent call last)",
+      "Cell \u001b[1;32mIn[43], line 1\u001b[0m\n\u001b[1;32m----> 1\u001b[0m \u001b[43mrasterize\u001b[49m\u001b[43m(\u001b[49m\u001b[43mvertices\u001b[49m\u001b[43m,\u001b[49m\u001b[43m \u001b[49m\u001b[43mfaces\u001b[49m\u001b[43m)\u001b[49m\n",
+      "Cell \u001b[1;32mIn[42], line 34\u001b[0m, in \u001b[0;36mrasterize\u001b[1;34m(vertices, faces)\u001b[0m\n\u001b[0;32m     31\u001b[0m image_size \u001b[38;5;241m=\u001b[39m (\u001b[38;5;241m800\u001b[39m, \u001b[38;5;241m800\u001b[39m)  \u001b[38;5;66;03m# Output image size in pixels\u001b[39;00m\n\u001b[0;32m     33\u001b[0m \u001b[38;5;66;03m# Use TensorFlow Graphics rasterizer (replace with actual rasterization call if using a different version)\u001b[39;00m\n\u001b[1;32m---> 34\u001b[0m rasterized_image \u001b[38;5;241m=\u001b[39m \u001b[43mrasterization_backend\u001b[49m\u001b[38;5;241;43m.\u001b[39;49m\u001b[43mrasterize\u001b[49m\u001b[43m(\u001b[49m\u001b[43mvertices_tensor\u001b[49m\u001b[43m,\u001b[49m\u001b[43m \u001b[49m\u001b[43mfaces_tensor\u001b[49m\u001b[43m,\u001b[49m\u001b[43m \u001b[49m\u001b[43mview_projection_matrix\u001b[49m\u001b[43m,\u001b[49m\u001b[43m \u001b[49m\u001b[43mimage_size\u001b[49m\u001b[43m)\u001b[49m\n\u001b[0;32m     36\u001b[0m \u001b[38;5;28;01mreturn\u001b[39;00m rasterized_image\n",
+      "File \u001b[1;32m~\\.conda\\envs\\reconstruct_src\\lib\\site-packages\\tensorflow_graphics\\rendering\\rasterization_backend.py:79\u001b[0m, in \u001b[0;36mrasterize\u001b[1;34m(vertices, triangles, view_projection_matrices, image_size, enable_cull_face, num_layers, backend)\u001b[0m\n\u001b[0;32m     76\u001b[0m   backend_module \u001b[38;5;241m=\u001b[39m importlib\u001b[38;5;241m.\u001b[39mimport_module(\n\u001b[0;32m     77\u001b[0m       \u001b[38;5;124m\"\u001b[39m\u001b[38;5;124mtensorflow_graphics.rendering.kernels.rasterization_backend\u001b[39m\u001b[38;5;124m\"\u001b[39m)\n\u001b[0;32m     78\u001b[0m \u001b[38;5;28;01melif\u001b[39;00m backend \u001b[38;5;241m==\u001b[39m RasterizationBackends\u001b[38;5;241m.\u001b[39mOPENGL:\n\u001b[1;32m---> 79\u001b[0m   backend_module \u001b[38;5;241m=\u001b[39m \u001b[43mimportlib\u001b[49m\u001b[38;5;241;43m.\u001b[39;49m\u001b[43mimport_module\u001b[49m\u001b[43m(\u001b[49m\n\u001b[0;32m     80\u001b[0m \u001b[43m      \u001b[49m\u001b[38;5;124;43m\"\u001b[39;49m\u001b[38;5;124;43mtensorflow_graphics.rendering.opengl.rasterization_backend\u001b[39;49m\u001b[38;5;124;43m\"\u001b[39;49m\u001b[43m)\u001b[49m\n\u001b[0;32m     81\u001b[0m \u001b[38;5;28;01melse\u001b[39;00m:\n\u001b[0;32m     82\u001b[0m   \u001b[38;5;28;01mraise\u001b[39;00m \u001b[38;5;167;01mKeyError\u001b[39;00m(\u001b[38;5;124m\"\u001b[39m\u001b[38;5;124mBackend is not supported: \u001b[39m\u001b[38;5;132;01m%s\u001b[39;00m\u001b[38;5;124m.\u001b[39m\u001b[38;5;124m\"\u001b[39m \u001b[38;5;241m%\u001b[39m backend)\n",
+      "File \u001b[1;32m~\\.conda\\envs\\reconstruct_src\\lib\\importlib\\__init__.py:127\u001b[0m, in \u001b[0;36mimport_module\u001b[1;34m(name, package)\u001b[0m\n\u001b[0;32m    125\u001b[0m             \u001b[38;5;28;01mbreak\u001b[39;00m\n\u001b[0;32m    126\u001b[0m         level \u001b[38;5;241m+\u001b[39m\u001b[38;5;241m=\u001b[39m \u001b[38;5;241m1\u001b[39m\n\u001b[1;32m--> 127\u001b[0m \u001b[38;5;28;01mreturn\u001b[39;00m \u001b[43m_bootstrap\u001b[49m\u001b[38;5;241;43m.\u001b[39;49m\u001b[43m_gcd_import\u001b[49m\u001b[43m(\u001b[49m\u001b[43mname\u001b[49m\u001b[43m[\u001b[49m\u001b[43mlevel\u001b[49m\u001b[43m:\u001b[49m\u001b[43m]\u001b[49m\u001b[43m,\u001b[49m\u001b[43m \u001b[49m\u001b[43mpackage\u001b[49m\u001b[43m,\u001b[49m\u001b[43m \u001b[49m\u001b[43mlevel\u001b[49m\u001b[43m)\u001b[49m\n",
+      "File \u001b[1;32m<frozen importlib._bootstrap>:1030\u001b[0m, in \u001b[0;36m_gcd_import\u001b[1;34m(name, package, level)\u001b[0m\n",
+      "File \u001b[1;32m<frozen importlib._bootstrap>:1007\u001b[0m, in \u001b[0;36m_find_and_load\u001b[1;34m(name, import_)\u001b[0m\n",
+      "File \u001b[1;32m<frozen importlib._bootstrap>:986\u001b[0m, in \u001b[0;36m_find_and_load_unlocked\u001b[1;34m(name, import_)\u001b[0m\n",
+      "File \u001b[1;32m<frozen importlib._bootstrap>:680\u001b[0m, in \u001b[0;36m_load_unlocked\u001b[1;34m(spec)\u001b[0m\n",
+      "File \u001b[1;32m<frozen importlib._bootstrap_external>:850\u001b[0m, in \u001b[0;36mexec_module\u001b[1;34m(self, module)\u001b[0m\n",
+      "File \u001b[1;32m<frozen importlib._bootstrap>:228\u001b[0m, in \u001b[0;36m_call_with_frames_removed\u001b[1;34m(f, *args, **kwds)\u001b[0m\n",
+      "File \u001b[1;32m~\\.conda\\envs\\reconstruct_src\\lib\\site-packages\\tensorflow_graphics\\rendering\\opengl\\rasterization_backend.py:30\u001b[0m\n\u001b[0;32m     28\u001b[0m   \u001b[38;5;28;01mimport\u001b[39;00m \u001b[38;5;21;01mos\u001b[39;00m\n\u001b[0;32m     29\u001b[0m   dir_path \u001b[38;5;241m=\u001b[39m os\u001b[38;5;241m.\u001b[39mpath\u001b[38;5;241m.\u001b[39mdirname(os\u001b[38;5;241m.\u001b[39mpath\u001b[38;5;241m.\u001b[39mabspath(\u001b[38;5;18m__file__\u001b[39m))\n\u001b[1;32m---> 30\u001b[0m   render_ops \u001b[38;5;241m=\u001b[39m \u001b[43mtf\u001b[49m\u001b[38;5;241;43m.\u001b[39;49m\u001b[43mload_op_library\u001b[49m\u001b[43m(\u001b[49m\u001b[43mos\u001b[49m\u001b[38;5;241;43m.\u001b[39;49m\u001b[43mpath\u001b[49m\u001b[38;5;241;43m.\u001b[39;49m\u001b[43mjoin\u001b[49m\u001b[43m(\u001b[49m\u001b[43mdir_path\u001b[49m\u001b[43m,\u001b[49m\u001b[43m \u001b[49m\u001b[38;5;124;43m\"\u001b[39;49m\u001b[38;5;124;43mrasterizer_op.so\u001b[39;49m\u001b[38;5;124;43m\"\u001b[39;49m\u001b[43m)\u001b[49m\u001b[43m)\u001b[49m\n\u001b[0;32m     31\u001b[0m \u001b[38;5;66;03m# pylint: enable=g-import-not-at-top\u001b[39;00m\n\u001b[0;32m     34\u001b[0m \u001b[38;5;28;01mdef\u001b[39;00m \u001b[38;5;21m_dim_value\u001b[39m(dim: Optional[\u001b[38;5;28mint\u001b[39m] \u001b[38;5;241m=\u001b[39m \u001b[38;5;28;01mNone\u001b[39;00m) \u001b[38;5;241m-\u001b[39m\u001b[38;5;241m>\u001b[39m \u001b[38;5;28mint\u001b[39m:\n",
+      "File \u001b[1;32m~\\.conda\\envs\\reconstruct_src\\lib\\site-packages\\tensorflow\\python\\framework\\load_library.py:54\u001b[0m, in \u001b[0;36mload_op_library\u001b[1;34m(library_filename)\u001b[0m\n\u001b[0;32m     31\u001b[0m \u001b[38;5;129m@tf_export\u001b[39m(\u001b[38;5;124m'\u001b[39m\u001b[38;5;124mload_op_library\u001b[39m\u001b[38;5;124m'\u001b[39m)\n\u001b[0;32m     32\u001b[0m \u001b[38;5;28;01mdef\u001b[39;00m \u001b[38;5;21mload_op_library\u001b[39m(library_filename):\n\u001b[0;32m     33\u001b[0m \u001b[38;5;250m  \u001b[39m\u001b[38;5;124;03m\"\"\"Loads a TensorFlow plugin, containing custom ops and kernels.\u001b[39;00m\n\u001b[0;32m     34\u001b[0m \n\u001b[0;32m     35\u001b[0m \u001b[38;5;124;03m  Pass \"library_filename\" to a platform-specific mechanism for dynamically\u001b[39;00m\n\u001b[1;32m   (...)\u001b[0m\n\u001b[0;32m     52\u001b[0m \u001b[38;5;124;03m    RuntimeError: when unable to load the library or get the python wrappers.\u001b[39;00m\n\u001b[0;32m     53\u001b[0m \u001b[38;5;124;03m  \"\"\"\u001b[39;00m\n\u001b[1;32m---> 54\u001b[0m   lib_handle \u001b[38;5;241m=\u001b[39m \u001b[43mpy_tf\u001b[49m\u001b[38;5;241;43m.\u001b[39;49m\u001b[43mTF_LoadLibrary\u001b[49m\u001b[43m(\u001b[49m\u001b[43mlibrary_filename\u001b[49m\u001b[43m)\u001b[49m\n\u001b[0;32m     55\u001b[0m   \u001b[38;5;28;01mtry\u001b[39;00m:\n\u001b[0;32m     56\u001b[0m     wrappers \u001b[38;5;241m=\u001b[39m _pywrap_python_op_gen\u001b[38;5;241m.\u001b[39mGetPythonWrappers(\n\u001b[0;32m     57\u001b[0m         py_tf\u001b[38;5;241m.\u001b[39mTF_GetOpList(lib_handle))\n",
+      "\u001b[1;31mNotFoundError\u001b[0m: C:\\Users\\pojzi\\.conda\\envs\\reconstruct_src\\lib\\site-packages\\tensorflow_graphics\\rendering\\opengl\\rasterizer_op.so not found"
+     ]
+    }
+   ],
+   "source": [
+    "rasterize(vertices, faces)"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": 37,
+   "id": "e591aed6-aa25-475f-945e-ba409882e8b9",
+   "metadata": {},
+   "outputs": [
+    {
+     "ename": "AttributeError",
+     "evalue": "module 'tensorflow' has no attribute 'create_tensor'",
+     "output_type": "error",
+     "traceback": [
+      "\u001b[1;31m---------------------------------------------------------------------------\u001b[0m",
+      "\u001b[1;31mAttributeError\u001b[0m                            Traceback (most recent call last)",
+      "Cell \u001b[1;32mIn[37], line 1\u001b[0m\n\u001b[1;32m----> 1\u001b[0m \u001b[43mtf\u001b[49m\u001b[38;5;241;43m.\u001b[39;49m\u001b[43mcreate_tensor\u001b[49m\n",
+      "\u001b[1;31mAttributeError\u001b[0m: module 'tensorflow' has no attribute 'create_tensor'"
+     ]
+    }
+   ],
+   "source": []
+  },
+  {
+   "cell_type": "code",
+   "execution_count": null,
+   "id": "9ff97b55-9dce-414b-9688-0242ec17e018",
+   "metadata": {},
+   "outputs": [],
+   "source": []
+  }
+ ],
+ "metadata": {
+  "kernelspec": {
+   "display_name": "Python 3 (ipykernel)",
+   "language": "python",
+   "name": "python3"
+  },
+  "language_info": {
+   "codemirror_mode": {
+    "name": "ipython",
+    "version": 3
+   },
+   "file_extension": ".py",
+   "mimetype": "text/x-python",
+   "name": "python",
+   "nbconvert_exporter": "python",
+   "pygments_lexer": "ipython3",
+   "version": "3.9.19"
+  }
+ },
+ "nbformat": 4,
+ "nbformat_minor": 5
+}
