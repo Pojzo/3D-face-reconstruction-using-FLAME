@@ -135,19 +135,20 @@ def detect_face_landmarks_tf(image: np.array, landmarks_model, show=False) -> np
 
 import torch
 import open3d as o3d
-from pytorch3d.structures import Meshes
 
-from pytorch3d.renderer import (
-    look_at_view_transform,
-    FoVPerspectiveCameras,
-    PointLights,
-    RasterizationSettings,
-    MeshRenderer,
-    MeshRasterizer,
-    SoftPhongShader,
-    HardPhongShader,
-    TexturesVertex
-)
+# from pytorch3d.structures import Meshes
+
+# from pytorch3d.renderer import (
+#     look_at_view_transform,
+#     FoVPerspectiveCameras,
+#     PointLights,
+#     RasterizationSettings,
+#     MeshRenderer,
+#     MeshRasterizer,
+#     SoftPhongShader,
+#     HardPhongShader,
+#     TexturesVertex
+# )
 
 def render_mesh(ply_path: str) -> np.array:
     o3d_mesh = o3d.io.read_triangle_mesh(ply_path)
