@@ -150,6 +150,12 @@ import open3d as o3d
 #     TexturesVertex
 # )
 
+class TexturesVertex:
+    def __init__(verts_features=None):
+        pass
+    
+
+
 # def render_mesh(ply_path: str) -> np.array:
 #     o3d_mesh = o3d.io.read_triangle_mesh(ply_path)
 #     o3d_mesh.compute_vertex_normals()

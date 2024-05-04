@@ -49,12 +49,11 @@ def render_image_from_mesh(vertices, faces):
     import open3d as o3d
 
     xyz, rgb, triangles = load(vertices, faces)
-    # Centralized directional light, pointing towards the origin from above
-    light_direction = tf.constant([[0., -1., 0.]])
-    light_direction = tf.linalg.l2_normalize(light_direction, -1)
-    ambient = 0.5  # Increased ambient lighting for more even illumination
-    rgb_lit = light(xyz, rgb, triangles, (1. - ambient) * light_direction, ambient)
 
+    light_direction = tf.constant([[0., -1, -1.2]])
+    light_direction = tf.linalg.l2_normalize(light_direction, -1)
+    ambient = 0.6
+    rgb_lit = light(xyz, rgb, triangles, (1.-ambient)*light_direction, ambient)
     imsize = [256, 256]
 
     angle = tf.constant([[0., 0., 0.]]) * np.pi / 180.
