@@ -48,10 +48,10 @@ def create_model():
     flattened_inputs = Flatten()(inputs)
 
     # Add a fully connected layer
-    fc1 = Dense(1024, activation='relu')(flattened_inputs)
+    fc1 = Dense(64, activation='relu')(flattened_inputs)
 
     # Add another fully connected layer
-    fc2 = Dense(512, activation='relu')(fc1)
+    fc2 = Dense(32, activation='relu')(fc1)
 
     # Define the output layer
     output_layer = OutputLayer()
