@@ -48,13 +48,15 @@ def create_model():
 
 def create_dataset(dataset_path: str, landmarks_model_path, transform: ImageDataGenerator=None, image_size: tuple = (224, 224)) -> tf.Tensor:
     landmarks_model = keras.models.load_model(landmarks_model_path)
+    vertical_crop = (450 - 316) // 2
 
     images = { "images": [], "landmarks": []}
     for filename in os.listdir(dataset_path):
         if filename.endswith(".jpg"):
             img_path = os.path.join(dataset_path, filename)
-            img = load_img(img_path, target_size=image_size)
+            img = load_img(img_path)
             img_array = img_to_array(img)
+            img_array =  img_array[:, vertical_crop:-vertical_crop, :]
             landmarks = landmarks_model(tf.expand_dims(tf.image.resize(img_array, (512, 512)), 0))
             # landmarks = detect_face_landmarks_tf(img_array, landmarks_model)
             images["images"].append(tf.convert_to_tensor(img_array) / 255.)

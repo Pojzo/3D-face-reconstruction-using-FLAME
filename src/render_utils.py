@@ -17,6 +17,7 @@ import open3d as o3d
 from ptfrenderer import utils
 from ptfrenderer import camera
 from ptfrenderer import mesh
+import matplotlib.pyplot as plt
 
 def render_image_from_mesh(vertices, faces):
     def align(xyz):
@@ -66,3 +67,42 @@ def render_image_from_mesh(vertices, faces):
     rendered_image = utils.alpha_matte(rendered_image, 1.0)  # white background
 
     return rendered_image
+
+def preprocess_rendered_image(image, crop=35, top_crop=5, target_size=(512, 512)):
+    width = image[0].shape[1]
+    height = image[0].shape[0]
+
+    cropped_image = tf.image.crop_to_bounding_box(image[:, :, :, :3], top_crop, crop // 2, height - crop + top_crop, width - crop)
+
+    resized_image = tf.image.resize(cropped_image, target_size)
+
+    return resized_image
+
+def visualize_landmarks(image, landmarks):
+    x = landmarks[::2] * image.shape[1]
+    y = landmarks[1::2] * image.shape[0]
+    plt.title("Facial landmarks visualization")
+    plt.scatter(x, y, s=3, color='r')
+
+    plt.imshow(image)
+
+def visualize_input_output_landmarks(input_landmarks, output_landmarks, input_image, output_image):
+    target = input_landmarks[0]
+    pred = output_landmarks
+
+    fig, axs = plt.subplots(nrows=2, ncols=2, figsize=(10, 10))
+
+    target_x = target[::2]
+    target_y = target[1::2]
+
+    pred_x = pred[::2]
+    pred_y = pred[1::2]
+
+    axs[0][0].imshow(input_image)
+    axs[0][0].scatter(target_x * input_image.shape[1], target_y * input_image.shape[0], color='orange', s=3)
+
+    axs[0][1].imshow(output_image)
+    axs[0][1].scatter(pred_x * output_image.shape[1], pred_y * output_image.shape[0], color='blue', s=3)
+
+    plt.scatter(target_x, target_y, color='orange')
+    plt.scatter(pred_x, pred_y, color='blue')
