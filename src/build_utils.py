@@ -35,14 +35,32 @@ def create_transform():
 
     return transform
 
+from tensorflow.keras.layers import Flatten, Dense
+from tensorflow.keras.models import Model
+from tensorflow.keras import Input
+
 def create_model():
-    base_model = ResNet50(weights='imagenet', include_top=False, pooling='avg', input_shape=(224, 224, 3))
-    base_model.trainable = False
+    # Define the input shape
+    input_shape = (224, 224, 3)
+    inputs = Input(shape=input_shape)
 
+    # Flatten the input
+    flattened_inputs = Flatten()(inputs)
+
+    # Add a fully connected layer
+    fc1 = Dense(1024, activation='relu')(flattened_inputs)
+
+    # Add another fully connected layer
+    fc2 = Dense(512, activation='relu')(fc1)
+
+    # Define the output layer
     output_layer = OutputLayer()
-    outputs = output_layer(base_model.output)
 
-    model = Model(inputs=base_model.input, outputs=outputs)
+    # Connect the second fully connected layer to the output layer
+    outputs = output_layer(fc2)
+
+    # Create the model
+    model = Model(inputs=inputs, outputs=outputs)
 
     return model
 
