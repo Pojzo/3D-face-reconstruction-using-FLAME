@@ -150,61 +150,61 @@ import open3d as o3d
 #     TexturesVertex
 # )
 
-def render_mesh(ply_path: str) -> np.array:
-    o3d_mesh = o3d.io.read_triangle_mesh(ply_path)
-    o3d_mesh.compute_vertex_normals()
+# def render_mesh(ply_path: str) -> np.array:
+#     o3d_mesh = o3d.io.read_triangle_mesh(ply_path)
+#     o3d_mesh.compute_vertex_normals()
 
-    # Step 2: Convert Open3D mesh to PyTorch3D mesh
-    verts = torch.tensor(np.asarray(o3d_mesh.vertices), dtype=torch.float32)
-    faces = torch.tensor(np.asarray(o3d_mesh.triangles), dtype=torch.int64)
-    device = torch.device("cuda:0" if torch.cuda.is_available() else "cpu")
+#     # Step 2: Convert Open3D mesh to PyTorch3D mesh
+#     verts = torch.tensor(np.asarray(o3d_mesh.vertices), dtype=torch.float32)
+#     faces = torch.tensor(np.asarray(o3d_mesh.triangles), dtype=torch.int64)
+#     device = torch.device("cuda:0" if torch.cuda.is_available() else "cpu")
 
-    # Define a simple color for the vertices (uniform gray in this example)
-    # verts_rgb = torch.full([1, verts.shape[0], 3], 0.5, dtype=torch.float32).to(device)  # Gray color
-    verts_rgb = torch.full((1, verts.shape[0], 3), 0.8, dtype=torch.float32).to(device)  # Uniform skin-like color
-    verts_rgb[:, :, 0] = 1.0  # Red channel
-    verts_rgb[:, :, 2] = 0.6  # Blue channel
-
-
-    # Create a Textures object with vertex colors
-    textures = TexturesVertex(verts_features=verts_rgb)
-
-    # Create a Meshes object for PyTorch3D
-    mesh = Meshes(verts=[verts.to(device)], faces=[faces.to(device)], textures=textures)
-
-    # Step 3: Set up the renderer
-    R, T = look_at_view_transform(dist=0.6, elev=0, azim=0)
-    cameras = FoVPerspectiveCameras(device=device, R=R, T=T)
-
-    # lights = PointLights(
-    #     # device=device,
-    #     location=[[0.0, 2.0, -2.0], [2.0, 1.0, 2.0], [-2.0, 1.0, 2.0]],
-    #     # diffuse_color=((0.8, 0.8, 0.8), (0.6, 0.6, 0.6), (0.6, 0.6, 0.6)),
-    #     # specular_color=((0.2, 0.2, 0.2), (0.1, 0.1, 0.1), (0.1, 0.1, 0.1))
-    # )
-
-    lights = PointLights(device=device, location=[[0.0, 0.0, 3.0]])
-    raster_settings = RasterizationSettings(image_size=512)
+#     # Define a simple color for the vertices (uniform gray in this example)
+#     # verts_rgb = torch.full([1, verts.shape[0], 3], 0.5, dtype=torch.float32).to(device)  # Gray color
+#     verts_rgb = torch.full((1, verts.shape[0], 3), 0.8, dtype=torch.float32).to(device)  # Uniform skin-like color
+#     verts_rgb[:, :, 0] = 1.0  # Red channel
+#     verts_rgb[:, :, 2] = 0.6  # Blue channel
 
 
-    raster_settings = RasterizationSettings(image_size=512)
+#     # Create a Textures object with vertex colors
+#     textures = TexturesVertex(verts_features=verts_rgb)
 
-    renderer = MeshRenderer(
-        rasterizer=MeshRasterizer(cameras=cameras, raster_settings=raster_settings),
-        shader=HardPhongShader(device=device, cameras=cameras, lights=lights)
-    )
+#     # Create a Meshes object for PyTorch3D
+#     mesh = Meshes(verts=[verts.to(device)], faces=[faces.to(device)], textures=textures)
 
-    # Step 4: Render the mesh
-    images = renderer(mesh)
+#     # Step 3: Set up the renderer
+#     R, T = look_at_view_transform(dist=0.6, elev=0, azim=0)
+#     cameras = FoVPerspectiveCameras(device=device, R=R, T=T)
 
-    return images
+#     # lights = PointLights(
+#     #     # device=device,
+#     #     location=[[0.0, 2.0, -2.0], [2.0, 1.0, 2.0], [-2.0, 1.0, 2.0]],
+#     #     # diffuse_color=((0.8, 0.8, 0.8), (0.6, 0.6, 0.6), (0.6, 0.6, 0.6)),
+#     #     # specular_color=((0.2, 0.2, 0.2), (0.1, 0.1, 0.1), (0.1, 0.1, 0.1))
+#     # )
 
-    # Display the rendered image using matplotlib
-    from matplotlib import pyplot as plt
-    plt.figure(figsize=(10, 10))
-    plt.imshow(images[0, ..., :3].cpu().numpy())
-    # plt.axis("off")
-    plt.show()
+#     lights = PointLights(device=device, location=[[0.0, 0.0, 3.0]])
+#     raster_settings = RasterizationSettings(image_size=512)
+
+
+#     raster_settings = RasterizationSettings(image_size=512)
+
+#     renderer = MeshRenderer(
+#         rasterizer=MeshRasterizer(cameras=cameras, raster_settings=raster_settings),
+#         shader=HardPhongShader(device=device, cameras=cameras, lights=lights)
+#     )
+
+#     # Step 4: Render the mesh
+#     images = renderer(mesh)
+
+#     return images
+
+#     # Display the rendered image using matplotlib
+#     from matplotlib import pyplot as plt
+#     plt.figure(figsize=(10, 10))
+#     plt.imshow(images[0, ..., :3].cpu().numpy())
+#     # plt.axis("off")
+#     plt.show()
 
 #returns the left and right bounds as ratios of the image width
 def get_vertical_bounds(image: np.array) -> tuple[float, float]:
