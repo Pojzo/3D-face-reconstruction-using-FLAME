@@ -31,12 +31,5 @@ Author: Peter Kovac, xkovac66
 
 ## MoSh: Motion and Shape Capture from Sparse Markers
 
-- **Authors:** Matthew M. Loper, Naureen Mahmood, Michael J. Black
-- **Published in:** ACM Transactions on Graphics, (Proc. SIGGRAPH Asia)
-- **Year:** 2014
-- **Volume:** 33
-- **Number:** 6
-- **Pages:** 220:1-220:13
-- **Publisher:** ACM
-- **DOI:** [10.1145/2661229.2661273](http://doi.acm.org/10.1145/2661229.2661273)
-- **Abstract:**
+- [MoSh: Motion and Shape Capture from Sparse Markers](http://doi.acm.org/10.1145/2661229.2661273) by Matthew M. Loper, Naureen Mahmood, and Michael J. Black (ACM Transactions on Graphics, Nov 2014)
+
