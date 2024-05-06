@@ -67,9 +67,13 @@ def render_image_from_mesh(vertices, faces):
 
     return rendered_image
 
-def preprocess_rendered_image(image, crop=35, top_crop=5, target_size=(512, 512)):
+def preprocess_rendered_image(image, crop=35, top_crop=5, target_size=(512, 512), pad_top=0):
     width = image[0].shape[1]
     height = image[0].shape[0]
+
+    if pad_top != 0:
+       pad = tf.ones((1, pad_top, width, image.shape[3]), dtype=image.dtype)
+       image = tf.concat([pad, image], axis=1)
 
     cropped_image = tf.image.crop_to_bounding_box(image[:, :, :, :3], top_crop, crop // 2, height - crop + top_crop, width - crop)
 
@@ -77,13 +81,31 @@ def preprocess_rendered_image(image, crop=35, top_crop=5, target_size=(512, 512)
 
     return resized_image
 
-def visualize_landmarks(image, landmarks):
+def visualize_landmarks(image, landmarks, save_path=None, show_comparison=False):
     x = landmarks[::2] * image.shape[1]
     y = landmarks[1::2] * image.shape[0]
-    plt.title("Facial landmarks visualization")
-    plt.scatter(x, y, s=3, color='r')
+    
+    if show_comparison:
+        fig, axes = plt.subplots(1, 2, figsize=(12, 6))
+        axes[0].imshow(image)
+        axes[0].axis('off')
+        axes[0].set_title('Original Image')
 
-    plt.imshow(image)
+        axes[1].imshow(image)
+        axes[1].scatter(x, y, s=3, color='r')
+        axes[1].axis('off')
+        axes[1].set_title('Image with Landmarks')
+
+    else:
+        plt.figure(figsize=(6, 6))
+        plt.imshow(image)
+        plt.scatter(x, y, s=3, color='r')
+        plt.title('Facial Landmarks Visualization')
+        plt.axis('off')
+
+    if save_path is not None:
+        plt.savefig(save_path)
+    plt.show()
 
 def visualize_input_output_landmarks(input_landmarks, output_landmarks, input_image, output_image):
     target = input_landmarks[0]
