@@ -19,6 +19,7 @@ Author: Peter Kovac, xkovac66
 
 ### FLAME model
 - Li, Tianye, et al. "Learning a model of facial shape and expression from 4D scans." ACM Transactions on Graphics, (Proc. SIGGRAPH Asia) 36.6 (2017): 194:1-194:17. [Link](https://doi.org/10.1145/3130800.3130813)
+- 
 
 ### SMPL model 
 - Loper, Matthew, et al. "{SMPL}: A Skinned Multi-Person Linear Model." ACM Trans. Graphics (Proc. SIGGRAPH Asia) 34.6 (2015): 248:1-248:16. [Link](https://dl.acm.org/doi/10.1145/2816795.2818013)
@@ -27,3 +28,15 @@ Author: Peter Kovac, xkovac66
 - Ma, D.S., Correll, J. & Wittenbrink, B. The Chicago face database: A free stimulus set of faces and norming data. Behav Res 47, 1122–1135 (2015). [Link](https://doi.org/10.3758/s13428-014-0532-5)
 - Ma, D.S., Correll, J. & Wittenbrink, B. The Chicago face database: A free stimulus set of faces and norming data. Behav Res 47, 1122–1135 (2015). [Link](https://doi.org/10.3758/s13428-014-0532-5)
 - Ma, D.S., Kantner, J. & Wittenbrink, B. Chicago Face Database: Multiracial expansion. Behav Res 53, 1289–1300 (2021). [Link](https://doi.org/10.3758/s13428-020-01482-5)
+
+## MoSh: Motion and Shape Capture from Sparse Markers
+
+- **Authors:** Matthew M. Loper, Naureen Mahmood, Michael J. Black
+- **Published in:** ACM Transactions on Graphics, (Proc. SIGGRAPH Asia)
+- **Year:** 2014
+- **Volume:** 33
+- **Number:** 6
+- **Pages:** 220:1-220:13
+- **Publisher:** ACM
+- **DOI:** [10.1145/2661229.2661273](http://doi.acm.org/10.1145/2661229.2661273)
+- **Abstract:**
