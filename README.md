@@ -5,8 +5,8 @@ Author: Peter Kovac, xkovac66
 Sources:
 
 https://github.com/TimoBolkart/TF_FLAME
-https://github.com/nikhilroxtomar/Human-Face-Landmark-Detection-in-TensorFlow
-https://github.com/szattila/pTFrenderer
+<br>https://github.com/nikhilroxtomar/Human-Face-Landmark-Detection-in-TensorFlow
+<br>https://github.com/szattila/pTFrenderer
 
 Paper citations:
 
