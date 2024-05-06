@@ -291,13 +291,12 @@ def render_face_from_flame(flame_params: Dict[str, tf.Tensor], smpl):
 
     flame_model = tf.squeeze(smpl(tf_trans, tf.concat([tf_shape, tf_exp], axis=-1), tf.concat([tf_rot, tf_pose], axis=-1)))
 
-    out_name = "output.ply"
-    mesh = Mesh(flame_model, smpl.f)
-    mesh.write_ply(out_name)
+    vertices = tf.cast(flame_model, tf.float32)
+    faces = smpl.f
 
-    rendered_image = render_mesh(out_name)[0]
+    rendered_image = render_image_from_mesh(vertices, faces)
 
-    return rendered_image
+    return rendered_image, (vertices, faces)
 
 import torch.nn as nn
 
