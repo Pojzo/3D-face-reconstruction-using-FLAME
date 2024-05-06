@@ -1,64 +1,26 @@
-Solution for my bachelor's thesis titled "The impact of facial expressions on 3D face recognition" 2023/2024
+# Solution for my bachelor's thesis titled "The impact of facial expressions on 3D face recognition" 2023/2024
 
 Author: Peter Kovac, xkovac66
 
-Sources:
+## Sources
 
-https://github.com/TimoBolkart/TF_FLAME
-<br>https://github.com/nikhilroxtomar/Human-Face-Landmark-Detection-in-TensorFlow
-<br>https://github.com/szattila/pTFrenderer
+- [TF_FLAME GitHub](https://github.com/TimoBolkart/TF_FLAME)
+- [Human-Face-Landmark-Detection-in-TensorFlow GitHub](https://github.com/nikhilroxtomar/Human-Face-Landmark-Detection-in-TensorFlow)
+- [pTFrenderer GitHub](https://github.com/szattila/pTFrenderer)
 
-Paper citations:
+## Paper Citations
 
-## pTFrenderer
-@article{ptfrenderer,
-  title={Unsupervised Generative 3D Shape Learning from Natural Images},
-  author={Szab{\'o}, Attila and Meishvili, Givi and Favaro, Paolo},
-  journal={arXiv preprint arXiv:1910.00287},
-  year={2019}
-}
+### pTFrenderer
+- Szabó, Attila, Givi Meishvili, and Paolo Favaro. "Unsupervised Generative 3D Shape Learning from Natural Images." arXiv preprint arXiv:1910.00287 (2019).
 
-## LaPa dataset
-@inproceedings{LaPa,
-  title={A New Dataset and Boundary-Attention Semantic Segmentation for Face Parsing},
-  author={Yinglu Liu and Hailin Shi and Hao Shen and Yue Si and Xiaobo Wang and Tao Mei},
-  booktitle={AAAI Conference on Artificial Intelligence},
-  year={2020},
-  url={https://api.semanticscholar.org/CorpusID:214302989}
-}
+### LaPa dataset
+- Liu, Yinglu, et al. "A New Dataset and Boundary-Attention Semantic Segmentation for Face Parsing." AAAI Conference on Artificial Intelligence (2020). [Link](https://api.semanticscholar.org/CorpusID:214302989)
 
-## FLAME model
-@article{FLAME:SiggraphAsia2017, 
-  title = {Learning a model of facial shape and expression from {4D} scans}, 
-  author = {Li, Tianye and Bolkart, Timo and Black, Michael. J. and Li, Hao and Romero, Javier}, 
-  journal = {ACM Transactions on Graphics, (Proc. SIGGRAPH Asia)}, 
-  volume = {36}, 
-  number = {6}, 
-  year = {2017}, 
-  pages = {194:1--194:17},
-  url = {https://doi.org/10.1145/3130800.3130813} 
-}
+### FLAME model
+- Li, Tianye, et al. "Learning a model of facial shape and expression from 4D scans." ACM Transactions on Graphics, (Proc. SIGGRAPH Asia) 36.6 (2017): 194:1-194:17. [Link](https://doi.org/10.1145/3130800.3130813)
 
-## SMPL model 
-@article{SMPL:2015,
-      author = {Loper, Matthew and Mahmood, Naureen and Romero, Javier and Pons-Moll, Gerard and Black, Michael J.},
-      title = {{SMPL}: A Skinned Multi-Person Linear Model},
-      journal = {ACM Trans. Graphics (Proc. SIGGRAPH Asia)},
-      month = oct,
-      number = {6},
-      pages = {248:1--248:16},
-      publisher = {ACM},
-      volume = {34},
-      year = {2015}
-    }
+### SMPL model 
+- Loper, Matthew, et al. "{SMPL}: A Skinned Multi-Person Linear Model." ACM Trans. Graphics (Proc. SIGGRAPH Asia) 34.6 (2015): 248:1-248:16.
 
-## Chicago face dataset
-@article{cfd,
-    author = {Ma, Deborah S. and Correll, Joshua and Wittenbrink, Bernd},
-    title = {The {Chicago} Face Database: A free stimulus set of faces and norming data},
-    journal = {Behavior Research Methods},
-    volume = {47},
-    number = {4},
-    pages = {1122--1135},
-    year = {2015},
-}
+### Chicago face dataset
+- Ma, Deborah S., Joshua Correll, and Bernd Wittenbrink. "The Chicago Face Database: A free stimulus set of faces and norming data." Behavior Research Methods 47.4 (2015): 1122-1135.
