@@ -21,8 +21,7 @@ Author: Peter Kovac, xkovac66
 - Li, Tianye, et al. "Learning a model of facial shape and expression from 4D scans." ACM Transactions on Graphics, (Proc. SIGGRAPH Asia) 36.6 (2017): 194:1-194:17. [Link](https://doi.org/10.1145/3130800.3130813)
 
 ### SMPL model 
-- Loper, Matthew, et al. "{SMPL}: A Skinned Multi-Person Linear Model." ACM Trans. Graphics (Proc. SIGGRAPH Asia) 34.6 (2015): 248:1-248:16.
-- [Link](https://dl.acm.org/doi/10.1145/2816795.2818013)
+- Loper, Matthew, et al. "{SMPL}: A Skinned Multi-Person Linear Model." ACM Trans. Graphics (Proc. SIGGRAPH Asia) 34.6 (2015): 248:1-248:16. [Link](https://dl.acm.org/doi/10.1145/2816795.2818013)
 
 ### Chicago face dataset
 - Ma, D.S., Correll, J. & Wittenbrink, B. The Chicago face database: A free stimulus set of faces and norming data. Behav Res 47, 1122–1135 (2015). [Link](https://doi.org/10.3758/s13428-014-0532-5)
