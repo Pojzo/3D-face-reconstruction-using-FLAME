@@ -20,7 +20,7 @@ class OutputLayer(layers.Layer):
         self.tf_rot = self.add_weight(shape=(1, 3), initializer="zeros", dtype=tf.float64, trainable=False)
         self.tf_pose = self.add_weight(shape=(1, 12), initializer="zeros", dtype=tf.float64, trainable=True)
         self.tf_shape = self.add_weight(shape=(1, 300), initializer="zeros", dtype=tf.float64, trainable=True)
-        self.tf_exp = self.add_weight(shape=(1, 100), initializer="zeros", dtype=tf.float64, trainable=True)
+        self.tf_exp = self.add_weight(shape=(1, 100), initializer="zeros", dtype=tf.float64, trainable=False)
 
     def call(self, inputs):
         # Concatenate all parameters into one vector
