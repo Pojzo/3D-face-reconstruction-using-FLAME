@@ -11,10 +11,10 @@ from keras.optimizers import Adam
 from keras.utils import load_img, img_to_array
 from my_utils import detect_face_landmarks_tf
 
-class OutputLayer(layers.Layer):
+class OutputLayer(Layer):
     def __init__(self):
         super(OutputLayer, self).__init__()
-        # adapted from the TF_FLAME repository
+        # Adapted from the TF_FLAME repository
         # https://github.com/TimoBolkart/TF_FLAME
         self.tf_trans = self.add_weight(shape=(1, 3), initializer="zeros", dtype=tf.float64, trainable=False)
         self.tf_rot = self.add_weight(shape=(1, 3), initializer="zeros", dtype=tf.float64, trainable=False)
@@ -24,7 +24,9 @@ class OutputLayer(layers.Layer):
 
     def call(self, inputs):
         # Concatenate all parameters into one vector
-        return tf.concat([self.tf_trans, self.tf_rot, self.tf_pose, self.tf_shape, self.tf_exp], axis=1)
+        output_vector = tf.concat([self.tf_trans, self.tf_rot, self.tf_pose, self.tf_shape, self.tf_exp], axis=1)
+        # Combine inputs (from dense layer) with the output_vector
+        return tf.concat([tf.cast(inputs, tf.float64), output_vector], axis=1)
 
 def create_transform():
     transform = ImageDataGenerator(
@@ -39,19 +41,20 @@ from tensorflow.keras.layers import Flatten, Dense
 from tensorflow.keras.models import Model
 from tensorflow.keras import Input
 
+
 def create_model():
     # Define the input shape
     input_shape = (224, 224, 3)
-    inputs = Input(shape=input_shape)
+    inputs = Input(shape=input_shape, dtype=tf.float32, name='input_layer')
 
     # Flatten the input
-    flattened_inputs = Flatten()(inputs)
+    flattened_inputs = Flatten(name='flatten')(inputs)
 
     # Add a fully connected layer
-    fc1 = Dense(64, activation='relu')(flattened_inputs)
+    fc1 = Dense(64, activation='relu', name='dense')(flattened_inputs)
 
     # Add another fully connected layer
-    fc2 = Dense(32, activation='relu')(fc1)
+    fc2 = Dense(32, activation='relu', name='dense_1')(fc1)
 
     # Define the output layer
     output_layer = OutputLayer()
@@ -60,8 +63,7 @@ def create_model():
     outputs = output_layer(fc2)
 
     # Create the model
-    model = Model(inputs=inputs, outputs=outputs)
-
+    model = Model(inputs=inputs, outputs=outputs, name='custom_model')
     return model
 
 def create_dataset(dataset_path: str, landmarks_model_path, transform: ImageDataGenerator=None, image_size: tuple = (224, 224)) -> tf.Tensor:
