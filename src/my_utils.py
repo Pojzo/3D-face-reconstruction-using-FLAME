@@ -21,11 +21,11 @@ import keras
 
 def extract_flame_params(data: tf.Tensor) -> Dict[str, tf.Tensor]:
     params = {
-        'trans': data[..., :3    ],
-        'rot'  : data[..., 3:6   ],
-        'pose' : data[..., 6:18  ],
-        'shape': data[..., 18:318],
-        'exp'  : data[..., 318:  ]
+        'trans': tf.cast(data[..., :3    ], tf.float64),
+        'rot'  : tf.cast(data[..., 3:6   ], tf.float64),
+        'pose' : tf.cast(data[..., 6:18  ], tf.float64),
+        'shape': tf.cast(data[..., 18:318], tf.float64),
+        'exp'  : tf.cast(data[..., 318:  ], tf.float64)
     }
 
     return params
