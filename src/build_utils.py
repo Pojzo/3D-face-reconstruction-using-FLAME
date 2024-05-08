@@ -12,60 +12,96 @@ from keras.utils import load_img, img_to_array
 from my_utils import detect_face_landmarks_tf
 
 
-class OutputLayer(layers.Layer):
+import tensorflow as tf
+from tensorflow.keras import layers, Model
+
+class OutputLayer(tf.keras.layers.Layer):
     def __init__(self):
         super(OutputLayer, self).__init__()
         # Adapted from the TF_FLAME repository
         # https://github.com/TimoBolkart/TF_FLAME
-        self.tf_trans = self.add_weight(shape=(1, 3), initializer="zeros", dtype=tf.float64, trainable=False)
-        self.tf_rot = self.add_weight(shape=(1, 3), initializer="zeros", dtype=tf.float64, trainable=False)
-        self.tf_pose = self.add_weight(shape=(1, 12), initializer="zeros", dtype=tf.float64, trainable=True)
-        self.tf_shape = self.add_weight(shape=(1, 300), initializer="zeros", dtype=tf.float64, trainable=True)
-        self.tf_exp = self.add_weight(shape=(1, 100), initializer="zeros", dtype=tf.float64, trainable=False)
+        self.tf_trans = self.add_weight(
+            shape=(1, 3),
+            initializer="zeros",
+            dtype=tf.float32,
+            trainable=False
+        )
+        self.tf_rot = self.add_weight(
+            shape=(1, 3),
+            initializer="zeros",
+            dtype=tf.float32,
+            trainable=False
+        )
+        self.tf_pose = self.add_weight(
+            shape=(1, 12),
+            initializer="zeros",
+            dtype=tf.float32,
+            trainable=False
+        )
+        self.tf_shape = self.add_weight(
+            shape=(1, 300),
+            initializer="zeros",
+            # initializer=tf.keras.initializers.RandomUniform(minval=-2, maxval=2),
+            dtype=tf.float32,
+            trainable=True
+        )
+        self.tf_exp = self.add_weight(
+            shape=(1, 100),
+            initializer="zeros",
+            dtype=tf.float32,
+            trainable=False
+        )
 
+    @tf.function
     def call(self, inputs):
         # Concatenate all parameters into one vector
-        output_vector = tf.concat([self.tf_trans, self.tf_rot, self.tf_pose, self.tf_shape, self.tf_exp], axis=1)
+        output_vector = tf.concat(
+            [self.tf_trans, self.tf_rot, self.tf_pose, self.tf_shape, self.tf_exp],
+            axis=1
+        )
+        output_vector = tf.tile(output_vector, [tf.shape(inputs)[0], 1])  # Repeat for each batch
+
         # Combine inputs (from dense layer) with the output_vector
-        return tf.concat([tf.cast(inputs, tf.float64), output_vector], axis=1)
+        return tf.concat([inputs, output_vector], axis=1)
 
-def create_transform():
-    transform = ImageDataGenerator(
-        rescale=1./255,
-        shear_range=0.2,
-        zoom_range=0.2,
-        horizontal_flip=True)
+class FLAMEModel(Model):
+    def __init__(self):
+        super(FLAMEModel, self).__init__()
+        base_model = tf.keras.applications.ResNet50(
+            include_top=False,
+            input_shape=(224, 224, 3),
+            pooling='avg',
 
-    return transform
+        )
+        base_model.trainable = False
+        self.encoder = Model(inputs=base_model.input, outputs=base_model.output)
 
-from tensorflow.keras.layers import Flatten, Dense
-from tensorflow.keras.models import Model
-from tensorflow.keras import Input
+        # Fully connected layers
+        self.fc1 = layers.Dense(1024, activation='relu', name="dense_1", dtype=tf.float32)
+        self.fc2 = layers.Dense(512, activation='relu', name="dense_2", dtype=tf.float32)
 
+        # Custom Output Layer for FLAME parameters
+        self.output_layer = OutputLayer()
 
-def create_model():
-    # Define the input shape
-    input_shape = (224, 224, 3)
-    inputs = Input(shape=input_shape, dtype=tf.float32, name='input_layer')
+    def call(self, inputs):
+        features = self.encoder(inputs)
+        x = self.fc1(features)
+        x = self.fc2(x)
+        return self.output_layer(x)
 
-    # Flatten the input
-    flattened_inputs = Flatten(name='flatten')(inputs)
+def create_optimizer():
+    optimizer = tf.keras.optimizers.legacy.Adam(
+    learning_rate=0.01,  # Higher learning rate
+    beta_1=0.9,          # Momentum (1st order)
+    beta_2=0.999,        # Momentum (2nd order)
+    epsilon=1e-07,
+    decay=1e-4          # Learning rate decay   
+    )
 
-    # Add a fully connected layer
-    fc1 = Dense(64, activation='relu', name='dense')(flattened_inputs)
+    return optimizer
 
-    # Add another fully connected layer
-    fc2 = Dense(32, activation='relu', name='dense_1')(fc1)
-
-    # Define the output layer
-    output_layer = OutputLayer()
-
-    # Connect the second fully connected layer to the output layer
-    outputs = output_layer(fc2)
-
-    # Create the model
-    model = Model(inputs=inputs, outputs=outputs, name='custom_model')
-    return model
+def create_loss():
+    return keras.losses.MeanSquaredError()
 
 def create_dataset(dataset_path: str, landmarks_model_path, transform: ImageDataGenerator=None, image_size: tuple = (224, 224)) -> tf.Tensor:
     landmarks_model = keras.models.load_model(landmarks_model_path)
