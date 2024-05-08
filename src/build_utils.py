@@ -11,7 +11,8 @@ from keras.optimizers import Adam
 from keras.utils import load_img, img_to_array
 from my_utils import detect_face_landmarks_tf
 
-class OutputLayer(Layer):
+
+class OutputLayer(layers.Layer):
     def __init__(self):
         super(OutputLayer, self).__init__()
         # Adapted from the TF_FLAME repository

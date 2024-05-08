@@ -19,6 +19,8 @@ from ptfrenderer import camera
 from ptfrenderer import mesh
 import matplotlib.pyplot as plt
 
+from typing import Dict
+
 def render_image_from_mesh(vertices, faces):
     def align(xyz):
         xyz_min = tf.reduce_min(xyz, axis=[0,1], keepdims=True)
@@ -81,6 +83,22 @@ def preprocess_rendered_image(image, crop=35, top_crop=5, target_size=(512, 512)
 
     return resized_image
 
+def render_face_from_flame(flame_params: Dict[str, tf.Tensor], smpl):
+    tf_trans = flame_params['trans']
+    tf_shape = flame_params['shape']
+    tf_exp = flame_params['exp']
+    tf_rot = flame_params['rot']
+    tf_pose = flame_params['pose']
+
+    flame_model = tf.squeeze(smpl(tf_trans, tf.concat([tf_shape, tf_exp], axis=-1), tf.concat([tf_rot, tf_pose], axis=-1)))
+
+    vertices = tf.cast(flame_model, tf.float32)
+    faces = smpl.f
+
+    rendered_image = render_image_from_mesh(vertices, faces)
+
+    return rendered_image
+
 def visualize_landmarks(image, landmarks, save_path=None, show_comparison=False):
     x = landmarks[::2] * image.shape[1]
     y = landmarks[1::2] * image.shape[0]
@@ -107,8 +125,8 @@ def visualize_landmarks(image, landmarks, save_path=None, show_comparison=False)
         plt.savefig(save_path)
     plt.show()
 
-def visualize_input_output_landmarks(input_landmarks, output_landmarks, input_image, output_image):
-    target = input_landmarks[0]
+def visualize_input_output_landmarks(input_landmarks, output_landmarks, input_image, output_image, save_path=None):
+    target = input_landmarks
     pred = output_landmarks
 
     fig, axs = plt.subplots(nrows=2, ncols=2, figsize=(10, 10))
@@ -121,9 +139,24 @@ def visualize_input_output_landmarks(input_landmarks, output_landmarks, input_im
 
     axs[0][0].imshow(input_image)
     axs[0][0].scatter(target_x * input_image.shape[1], target_y * input_image.shape[0], color='orange', s=3)
+    axs[0][0].set_title("Original image with landmarks")
 
     axs[0][1].imshow(output_image)
     axs[0][1].scatter(pred_x * output_image.shape[1], pred_y * output_image.shape[0], color='blue', s=3)
+    axs[0][1].set_title("Reconstructed image with landmarks")
 
-    plt.scatter(target_x, target_y, color='orange')
-    plt.scatter(pred_x, pred_y, color='blue')
+     # Draw lines between corresponding landmarks
+    for (x1, y1, x2, y2) in zip(target_x * input_image.shape[1], target_y * input_image.shape[0],
+                                 pred_x * input_image.shape[1], pred_y * input_image.shape[0]):
+        axs[1][1].plot([-x1, -x2], [-y1, -y2], 'g-')  # 'g-' specifies green lines
+
+    axs[1][1].set_title("Comparison of Landmarks")
+    axs[1][1].legend()
+
+    axs[1][0].scatter(-target_x, -target_y, color='orange', s=3)
+    axs[1][0].scatter(-pred_x, -pred_y, color='blue', s=3)
+    axs[1][0].set_title("Side by side lmks comparison")
+
+    plt.tight_layout()
+    fig.savefig(save_path)
+    plt.show()

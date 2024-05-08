@@ -363,3 +363,25 @@ def train(model, dataset, device: str = 'GPU:0', epochs: int = 1):
 
             avg_loss = total_loss / num_batches
             print(f"Epoch: {epoch + 1}, Loss: {avg_loss}")
+
+
+def get_lmks_to_1D(lmks_model, input_image):
+    if type(input_image) == list:
+        input_image = tf.convert_to_tensor()
+
+    if input_image.shape[0] != 1:
+        input_image = tf.expand_dims(input_image, 0)
+
+    if input_image.shape[-1] == 4:
+        input_image = input_image[:, :, :, :3]
+
+    return lmks_model(tf.image.resize(input_image, (512, 512)))[0]
+
+def get_lmks_to_2D(lmks_model, input_image):
+    if type(input_image) == list:
+        input_image = tf.convert_to_tensor()
+
+    if input_image.shape[0] != 1:
+        input_image = tf.expand_dims(input_image, 0)
+
+    return lmks_model(tf.image.resize(input_image, (512, 512)))[0]
